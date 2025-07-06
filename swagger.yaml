@@ -1,0 +1,96 @@
+openapi: 3.0.0
+info:
+  title: Simple Auth API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /auth/login:
+    post:
+      summary: Get tokens for user
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tokens
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+              example:
+                access_token: "jwt.token.here"
+                refresh_token: "base64token"
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /auth/refresh:
+    post:
+      summary: Refresh tokens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: New tokens
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+        '401':
+          description: Invalid tokens
+  /auth/user:
+    get:
+      summary: Get user ID
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+              example:
+                user_id: "123e4567-e89b-12d3-a456-426614174000"
+        '401':
+          description: Unauthorized
+  /auth/logout:
+    post:
+      summary: Logout
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

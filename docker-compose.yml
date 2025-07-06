@@ -1,0 +1,22 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgres://user:password@postgres:5432/authdb?sslmode=disable
+      - PORT=8080
+      - JWT_SECRET=my-secret-key
+      - WEBHOOK_URL=http://example.com/webhook
+
+  postgres:
+    image: cr.yandex/mirror/library/postgres:13-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: authdb
+    volumes:
+      - ./migrations:/docker-entrypoint-initdb.d
